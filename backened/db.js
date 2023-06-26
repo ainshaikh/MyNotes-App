@@ -1,5 +1,5 @@
 const mongoose = require ('mongoose');
-const mongoURI = 'mongodb://0.0.0.0:27017'; 
+const mongoURI = 'mongodb://0.0.0.0:27017/mynotes';  // connection to databeses from MongoDB compass
 
 const connectToMongo = async () => {
     try {

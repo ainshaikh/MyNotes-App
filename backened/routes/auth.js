@@ -4,11 +4,11 @@ const router = express.Router();
 const { body, validationResult } = require("express-validator");
 const bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
+var fetchuser = require ("../middleware/fetchuser.js")
+const JWT_secret = "ainisagoodboy"; 
 
-const JWD_secret = "ainisagoodboy"; 
 
-
-// Create a user using POST "api/auth/createuser".No login required
+// Route 1: Create a user using POST "api/auth/createuser".No login required
 router.post(
   "/createuser",
   [
@@ -50,7 +50,7 @@ router.post(
             id: user.id
         }
       }
-      var authToken = jwt.sign({data}, JWD_secret);
+      var authToken = jwt.sign({data}, JWT_secret);
 
                 res.json({authToken});
     }
@@ -61,7 +61,7 @@ router.post(
     }  );  
 
 
-    // Authenticate  a user using POST "api/auth/login".
+    //Route 2:  Authenticate  a user using POST "api/auth/Nologin".
     router.post(
         "/login",
         [
@@ -94,7 +94,7 @@ router.post(
                         id: user.id
                     }
                   }
-                  var authToken = jwt.sign({data}, JWD_secret);
+                  var authToken = jwt.sign({data}, JWT_secret);
             
                             res.json({authToken});
             }
@@ -103,6 +103,27 @@ router.post(
                 res.status(500).send("Internal server Error")
             }
         })
+
+         //Route 3:  Get loggedin user data  details using POST "api/auth/getuser". login required.
+
+         router.post(
+          "/getuser", fetchuser, async (req, res) => {  // fetchuser is a middleware
+            try {
+              
+             const userId  = req.user.id;
+              const user = await User.findById(userId).select("-password")
+              if (!user) {
+                return res.status(404).send("User not found");
+              }
+           
+              res.send(userId);
+            } catch (error) {
+              console.log(error.message);
+              res.status(500).send("Internal server error")
+            }
+          })
+
+
     
 
 module.exports = router;

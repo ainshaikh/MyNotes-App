@@ -52,7 +52,7 @@ router.post(
   }
 );
 
-// Route-3 Get all the notes using PUT "api/notes/uodatenote"  login required
+// Route-3 Update all the notes using PUT "api/notes/uodatenote"  login required
 
 router.put("/updatenote/:id", fetchuser, async (req, res) => {
   const { title, description, tag } = req.body;

@@ -20,11 +20,12 @@ router.post(
       .withMessage("Password must be at least 5 characters"),
   ],
   async (req, res) => {
+    let success = false;
    
       // if there are errors, return bad request with errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({success, errors: errors.array() });
       }
 
       
@@ -32,7 +33,7 @@ router.post(
       try{
       const existingUser = await User.findOne({ email: req.body.email });
       if (existingUser) {
-        return res.status(400).json({ error: 'Sorry, a user already exists with the same email id' });
+        return res.status(400).json({success, error: 'Sorry, a user already exists with the same email id' });
       }
 
         // creating password hash
@@ -50,9 +51,11 @@ router.post(
             id: user.id
         }
       }
-      var authToken = jwt.sign({data}, JWT_secret);
+      var authtoken = jwt.sign({data}, JWT_secret);
 
-                res.json({authToken});
+      success = true; 
+
+                res.json({success, authtoken});
     }
     catch(err){
         console.log(err.message);
@@ -73,6 +76,7 @@ router.post(
             .withMessage("Password cannot be empty"),
         ],
         async (req, res) => {
+          let success = false;
          
             // if there are errors, return bad request with errors
             const errors = validationResult(req);
@@ -87,7 +91,8 @@ router.post(
                 }
                 const passwordCompare = await bcrypt.compare(password, user.password);
                 if(!passwordCompare){
-                    return res.status(400).json({error: "please write correct credentials"})
+                  success = false;
+                    return res.status(400).json({success, error: "please write correct credentials"})
                 }
                 const data = {
                     user:{
@@ -95,8 +100,8 @@ router.post(
                     }
                   }
                   var authToken = jwt.sign({data}, JWT_secret);
-            
-                            res.json({authToken});
+                  success = true;
+                            res.json({success, authToken});
             }
             catch(err){
                 console.log(err.message);

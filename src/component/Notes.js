@@ -2,13 +2,20 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import noteContext from "../context/notes/noteContext";
 import Noteitem from "./Noteitem";
 import AddNote from "./AddNote";
+import { useNavigate } from "react-router-dom";
 
-const Notes = () => {
+const Notes = (props) => {
   const context = useContext(noteContext);
   const { notes, getNotes, editNote } = context;
   const [note, setNote] = useState({id: "", etitle: "", edescription: "", etag: ""})
+  let navigate = useNavigate();
   useEffect(() => {
-    getNotes();
+    if(localStorage.getItem('token')){
+      getNotes();
+     }
+     else{
+      navigate("/login")
+     }
     // eslint-disable-next-line
   }, []);
   const ref = useRef(null);
@@ -17,12 +24,14 @@ const Notes = () => {
     ref.current.click();
    
     setNote({id: currentNote._id, etitle: currentNote.title, edescription: currentNote.description, etag: currentNote.tag});
+    
   };
 
 const handleClick =(e)=>{
   console.log("Updating the notes..."+ note);
   refClose.current.click();
   editNote(note.id, note.etitle, note.edescription, note.etag);
+  props.showAlert("Updated successfully", "success")
 }
 const handlingChange =(e)=>{
     setNote({...note, [e.target.name]: e.target.value})
@@ -30,7 +39,7 @@ const handlingChange =(e)=>{
 
   return (
     <>
-      <AddNote />
+      <AddNote showAlert={props.showAlert}/>
 
       <button
         ref={ref}
@@ -80,6 +89,7 @@ const handlingChange =(e)=>{
                     name="etitle"
                     onChange={handlingChange}
                     aria-describedby="emailHelp"
+                    minLength={5} required
                   />
                   <div id="emailHelp" className="form-text"></div>
                 </div>
@@ -94,6 +104,7 @@ const handlingChange =(e)=>{
                     value={note.edescription}
                     name="edescription"
                     onChange={handlingChange}
+                    minLength={5} required
                   />
                 </div>
                 <div className="mb-3">
@@ -131,9 +142,12 @@ const handlingChange =(e)=>{
 
       <div className="row my-3">
         <h2>Your Note</h2>
+        <div className="container mx-2">
+        {notes.length === 0 && 'No notes to display' }
+        </div>
         {notes.map((note) => {
           return (
-            <Noteitem key={note._id} updateNote={updateNote} note={note} />
+            <Noteitem key={note._id} updateNote={updateNote} showAlert={props.showAlert} note={note} />
           );
         })}
       </div>

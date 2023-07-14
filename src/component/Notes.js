@@ -145,9 +145,9 @@ const handlingChange =(e)=>{
         <div className="container mx-2">
         {notes.length === 0 && 'No notes to display' }
         </div>
-        {notes.map((note) => {
+        {Array.from(notes).map((note) => {
           return (
-            <Noteitem key={note._id} updateNote={updateNote} showAlert={props.showAlert} note={note} />
+            <Noteitem key={note._id} updateNote={updateNote}  note={note} showAlert={props.showAlert} />
           );
         })}
       </div>
